@@ -1,0 +1,24 @@
+{
+  "name": "pt8005",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node --transpile-only src/index.ts",
+    "start_split": "ts-node --transpile-only src/split_time.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "serialport": "^9.1.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.170",
+    "@types/node": "^15.12.2",
+    "@types/serialport": "^8.0.1",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
+  }
+}
