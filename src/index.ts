@@ -19,21 +19,33 @@ enum FLAGS {
     LIMIT_OVER = 0x07,
     LIMIT_UNDER = 0x08,
 
-    RANGE_30_80 = 0x10,
-    _RANGE_30_80 = 0x30,
+  RANGE_30_80 = 0x30,
 
-    _RANGE_50_100 = 0x20,
-    RANGE_50_100 = 0x75,
+  XX_RANGE_50_100 = 0x20,
+  RANGE_50_100 = 0x4B,
 
-    RANGE_80_130 = 0x76,
+  RANGE_80_130 = 0x4C,
     RANGE_30_130 = 0x40,
     FREQUENZY_DBA = 0x1B,
     FREQUENZY_DBC = 0x1C,
     DATA = 0x0D,
 
 
+  RECORDING = 0xA,
     _FULL = 0x23,
     HOLD = 0x11,
+
+
+  XX1 = 0x19,
+  XX2 = 0x1F,
+  XX3 = 0x1A,
+  XX4 = 0xC,
+  XX5 = 0xB,
+  XX7_IN_RANGE = 0xE,
+  XX9 = 0x76,
+  XX10 = 0x75,
+  XX_RANGE_30_80 = 0x10,
+
 }
 
 function calcTime(buffer: Buffer) {
@@ -86,6 +98,7 @@ type PTMeterReadings = {
 
 type PTMeterSettings = {
     range: string;
+  recording: boolean;
     speed: "slow" | "fast";
     frequency: "dbA" | "dbC";
     mode: "min" | "max" | "default";
@@ -209,7 +222,7 @@ class PTMeter {
                 value: NaN,
                 time: ""
             },
-            settings: {mode: 'default'}
+      settings: { mode: 'default', recording:false }
         }
 
         if (this.verbose) {
@@ -220,10 +233,11 @@ class PTMeter {
 
         parts.forEach((part) => {
             const partBuffer = Buffer.from(part, 'hex')
+      if (partBuffer.length === 0) return;
             /*first byte of buffer is the flag*/
             /*rest of buffer contains value - if any*/
             const [flag, ...rest] = partBuffer;
-            this.setFrameValue(frame, FLAGS[flag], Buffer.from(rest))
+      this.setFrameValue(frame, FLAGS[flag] || flag.toString(16), Buffer.from(rest))
         })
 
         this.frames.push(frame);
@@ -237,7 +251,6 @@ class PTMeter {
             case FLAGS[FLAGS.RANGE_30_130]:
             case FLAGS[FLAGS.RANGE_50_100]:
             case FLAGS[FLAGS.RANGE_80_130]:
-            case FLAGS[FLAGS._RANGE_30_80]:
                 frame.settings.range = flag;
                 break;
             case FLAGS[FLAGS.FREQUENZY_DBA]:
@@ -258,6 +271,9 @@ class PTMeter {
             case FLAGS[FLAGS.MODE_MIN]:
                 frame.settings.mode = 'min';
                 break;
+      case FLAGS[FLAGS.RECORDING]:
+        frame.settings.recording = true;
+        break;
             case FLAGS[FLAGS.LIMIT_OVER]:
                 frame.readings.rangeLimitExceeded = 'over';
                 break;
