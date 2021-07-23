@@ -118,3 +118,5 @@ dist
 
 .idea_org/
 .DS_Store
+
+/db

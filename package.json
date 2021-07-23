@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.21",
-    "serialport": "^9.1.0"
+    "serialport": "^9.1.0",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.170",
