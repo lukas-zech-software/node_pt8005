@@ -1,0 +1,20 @@
+
+.active {
+    background-color: #39a33c !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.error {
+    background-color: crimson !important;
+}
+
+#dbmessage {
+    background-color: #39a33c;
+}
