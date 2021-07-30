@@ -185,7 +185,7 @@ export class PTMeter {
   }
 
   private openSerialPort (): SerialPort {
-    const device = '/dev/tty.usbserial-0001';
+    const device = process.env.PT_DEVICE||'/dev/tty.usbserial-0001';
 
     const port = new SerialPort(device, {
       baudRate: 9600,
