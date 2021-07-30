@@ -2,11 +2,11 @@
   "name": "pt8005",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node --transpile-only src/index.ts",
-    "start_meter": "ts-node --transpile-only src/index.ts",
-    "db": "ts-node --transpile-only src/db.ts"
+    "start": "node dist/index.js",
+    "dev": "ts-node --transpile-only src/index.ts",
+    "build": "tsc -p ./tsconfig.json --noEmit false"
   },
   "keywords": [],
   "author": "",
@@ -20,9 +20,7 @@
     "json-2-csv": "^3.14.1",
     "lodash": "^4.17.21",
     "pug": "^3.0.2",
-    "serialport": "^9.1.0",
-    "ts-node": "^10.0.0",
-    "typescript": "^4.3.2"
+    "serialport": "^9.1.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^5.4.3",
@@ -32,6 +30,8 @@
     "@types/lodash": "^4.14.170",
     "@types/morgan": "^1.9.3",
     "@types/node": "^15.12.2",
-    "@types/serialport": "^8.0.1"
+    "@types/serialport": "^8.0.1",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
   }
 }
