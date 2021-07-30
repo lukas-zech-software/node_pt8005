@@ -1,5 +1,7 @@
 import * as SqliteDatabase from 'better-sqlite3'
 import { Database } from 'better-sqlite3'
+import { join } from 'path'
+import { existsSync, mkdirSync } from 'fs'
 import {
   DbEnvironmentsAndWindowState,
   MeasurementValuesEntry,
@@ -25,9 +27,13 @@ export class DbService {
   }
 
   connectDb (): Database {
-    let dbfilename = 'database.db';
+    let dbPath = join(__dirname, '../db');
 
-    const db = new SqliteDatabase(dbfilename, {})
+    if (!existsSync(dbPath)) {
+      mkdirSync(dbPath)
+    }
+
+    const db = new SqliteDatabase(join(dbPath,'database.db'), {})
 
     db.exec(`
         CREATE TABLE IF NOT EXISTS last_state (
