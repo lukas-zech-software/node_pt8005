@@ -1,6 +1,6 @@
 import * as SqliteDatabase from 'better-sqlite3'
 import { Database } from 'better-sqlite3'
-import { join } from 'path'
+import { join,dirname } from 'path'
 import { existsSync, mkdirSync } from 'fs'
 import {
   DbEnvironmentsAndWindowState,
@@ -21,19 +21,19 @@ export class DbService {
   }
 
   private readonly db: Database;
+  public readonly dbPath: string;
 
   constructor () {
+    this.dbPath = join(__dirname, '../db','database.db');
     this.db = this.connectDb();
   }
 
   connectDb (): Database {
-    let dbPath = join(__dirname, '../db');
-
-    if (!existsSync(dbPath)) {
-      mkdirSync(dbPath)
+  	if (!existsSync(dirname(this.dbPath))) {
+      mkdirSync(dirname(this.dbPath))
     }
 
-    const db = new SqliteDatabase(join(dbPath,'database.db'), {})
+    const db = new SqliteDatabase(this.dbPath, {})
 
     db.exec(`
         CREATE TABLE IF NOT EXISTS last_state (
@@ -41,9 +41,9 @@ export class DbService {
           environment_id INTEGER NOT NULL,
           window_state_id INTEGER NOT NULL,
           FOREIGN KEY (environment_id)
-            REFERENCES environments (id) 
-          FOREIGN KEY (window_state_id) 
-            REFERENCES window_states (id) 
+            REFERENCES environments (id)
+          FOREIGN KEY (window_state_id)
+            REFERENCES window_states (id)
         );
     `);
 
@@ -71,10 +71,10 @@ export class DbService {
           min REAL NOT NULL,
           max REAL NOT NULL,
           mean REAL NOT NULL,
-          FOREIGN KEY (environment_id) 
-            REFERENCES environments (id) 
-          FOREIGN KEY (window_state_id) 
-            REFERENCES window_states (id) 
+          FOREIGN KEY (environment_id)
+            REFERENCES environments (id)
+          FOREIGN KEY (window_state_id)
+            REFERENCES window_states (id)
         );
     `);
 
@@ -129,7 +129,7 @@ INSERT INTO measurement_values (
 
   getValues (from: number = 0, to: number = Date.now()): Array<MeasurementValuesExport> {
     const stmt = this.db.prepare(`
-SELECT 
+SELECT
   min,
   max,
   mean,
@@ -138,14 +138,14 @@ SELECT
   window_states.name as windowState
 FROM
   measurement_values
-INNER JOIN 
-  environments 
+INNER JOIN
+  environments
 ON
  measurement_values.environment_id = environments.id
-INNER JOIN 
-  window_states 
+INNER JOIN
+  window_states
 ON
- measurement_values.window_state_id = window_states.id    
+ measurement_values.window_state_id = window_states.id
 WHERE
   timestamp >= @from
 AND
@@ -157,7 +157,7 @@ AND
 
   getLastState (): PtMeterEnvironmentInfo {
     const stmt = this.db.prepare(`
-SELECT 
+SELECT
   environment_id as environment,
   window_state_id as windowState
 FROM
@@ -171,9 +171,9 @@ WHERE
 
   setLastState (info: PtMeterEnvironmentInfo): void {
     const update = this.db.prepare(`
-UPDATE 
-  last_state 
-SET 
+UPDATE
+  last_state
+SET
   environment_id=@environment,
   window_state_id=@windowState
 WHERE

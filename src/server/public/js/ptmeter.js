@@ -31,3 +31,7 @@ function setWindowState (id) {
 function downloadCsv () {
   window.open('/export/csv/ptmeter_export.csv',"_blank")
 }
+
+function downloadDb () {
+  window.open('/export/db/ptmeter.sqlite.db',"_blank")
+}
