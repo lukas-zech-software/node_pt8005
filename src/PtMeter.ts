@@ -12,6 +12,16 @@ import {
 } from './common';
 import Delimiter = SerialPort.parsers.Delimiter;
 
+
+enum COMMANDS {
+	Min_Max = 0x11,
+	off = 0x33,
+	rec = 0x55,
+	speed = 0x77,
+	range = 0x88,
+	dBA_C = 0x99
+}
+
 enum FLAGS {
 	TERMINATOR = 0x00,
 	DELIMITER = 0xA5,
@@ -53,6 +63,9 @@ enum FLAGS {
 
 }
 
+type Ranges = FLAGS.RANGE_30_80 | FLAGS.RANGE_50_100 | FLAGS.RANGE_80_130 | FLAGS.RANGE_30_130;
+
+
 function calcTime(buffer: Buffer) {
 	//<Buffer 24 03 27 >
 	const bufferString = buffer.toString('hex');
@@ -77,7 +90,7 @@ function calcTime(buffer: Buffer) {
 function calcData(buffer: Buffer) {
 	//<Buffer 04 52>
 	const bufferString = buffer.toString('hex');
-	let [v100 = '0', v10 = '0', v1 = '0', v01 = '0'] = bufferString;
+	// let [v100 = '0', v10 = '0', v1 = '0', v01 = '0'] = bufferString;
 	//console.log("[v100='0',v10='0',v1='0',v01='0']", [v100, v10, v1, v01]);
 	const parsed = parseInt(bufferString, 10)
 
@@ -110,6 +123,7 @@ export class PTMeter {
 	private totalFramesRead: number = 0;
 	private framesBuffer: Array<PTFrame> = [];
 	private measurementValuesEntriesBuffer: Array<MeasurementValuesEntry> = [];
+	private targetRange: Ranges = FLAGS.RANGE_30_130;
 
 	constructor() {
 		this.port = this.openSerialPort();
@@ -140,6 +154,7 @@ export class PTMeter {
 			throw err
 		});
 
+
 		setInterval(() => {
 			this.aggregateFrames()
 		}, this.logInterval)
@@ -148,7 +163,9 @@ export class PTMeter {
 			this.writeValuesToDb()
 		}, this.writeInterval)
 
-		this.infoMessage = "Initialised"
+		/*this.init().then(() => {
+			this.infoMessage = "Initialised"
+		})*/
 	}
 
 	public static getInstance(): PTMeter {
@@ -158,6 +175,43 @@ export class PTMeter {
 
 		return instance;
 	}
+
+	/*
+
+		async init(): Promise<void> {
+			let isCorrectRangeSet = await this.checkRange();
+			if (!isCorrectRangeSet) {
+				// trigger range command until meter returns target range
+				console.log('Triggering range command');
+
+				await this.sendCommand(COMMANDS.range);
+				return this.init()
+			}
+		}
+
+		async checkRange(): Promise<boolean> {
+			// wait for some frames
+			const now = Date.now()
+			await new Promise(r => setTimeout(r, this.logInterval))
+			console.log('wait',Date.now()-now);
+
+			const lastFrames = this.framesBuffer;
+			this.framesBuffer = [];
+
+			const allReceivedRanges = new Set<string | undefined>()
+			lastFrames.forEach(x => allReceivedRanges.add(x.settings.range))
+
+			const result = allReceivedRanges.has(FLAGS[this.targetRange])
+
+			if (!result) {
+				let rangesString = Array.from(allReceivedRanges.values()).map(x => x || 'N/A').join(',');
+				console.log(`Received ranges ${rangesString} from ${lastFrames.length} frames did not include target range ${FLAGS[this.targetRange]}`);
+			}
+
+			return result;
+		}
+	*/
+
 
 	public getMeterStatus(): PtMeterStatus {
 		return {
@@ -172,6 +226,20 @@ export class PTMeter {
 	public setEnvironment(environment: Partial<PtMeterEnvironmentInfo>): void {
 		this.currentEnvironmentInfo = {...this.currentEnvironmentInfo, ...environment}
 		this.db.setLastState(this.currentEnvironmentInfo)
+	}
+
+	public async sendCommand(command: COMMANDS): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.port.write([command], (err) => {
+				if (err) {
+					console.log('Error on write: ', err.message)
+					reject(err);
+					return;
+				}
+				console.log(`command ${COMMANDS[command]} written`)
+				resolve();
+			})
+		})
 	}
 
 	private writeValuesToDb(): void {
@@ -216,9 +284,11 @@ export class PTMeter {
 	private aggregateFrames(): void {
 		const lastFrames = this.framesBuffer;
 		this.framesBuffer = [];
+
 		if (lastFrames.length === 0) {
 			console.warn('No frames received. Check Meter');
-			this.infoMessage = "No data received. Check Meter"
+			this.infoMessage = "No data received. Check Meter";
+			return;
 		}
 
 		lastFrames.forEach(x => this.lastSettings = Object.assign({}, this.lastSettings, x.settings))
@@ -227,10 +297,9 @@ export class PTMeter {
 				.filter(x => x.readings.rangeLimitExceeded === undefined)
 				.filter(x => x.readings.hold === undefined);
 
-
 		const values = validFrames.map(x => x.readings.value);
 		// TODO: Use current range from device?
-		const validValues = values.filter(x => x !== undefined && inRange(x, 30, 120))
+		const validValues = values.filter(x => x !== undefined && inRange(x, 20, 120))
 
 		if (this.verbose) {
 			const diff = lastFrames.length - validFrames.length;
@@ -242,13 +311,15 @@ export class PTMeter {
 			if (diffVal !== 0) {
 				console.log(`Dropped ${diffVal} invalid values`);
 			}
+
+			console.log(`${validValues.length} valid values found`);
 		}
 
 		if (validValues.length === 0) {
-			if (this.verbose) {
-				console.log('No valid values to aggregate');
-			}
-
+			this.lastValues = undefined;
+			let message = `No valid values found. Check Range on meter`;
+			console.log(message);
+			this.infoMessage = message;
 			return;
 		}
 
@@ -256,6 +327,10 @@ export class PTMeter {
 			min: round(min(validValues) || 0, 1),
 			max: round(max(validValues) || 0, 1),
 			mean: round(mean(validValues) || 0, 1),
+		}
+
+		if (this.verbose) {
+			console.log(`Aggregate`, aggregate);
 		}
 
 		this.lastValues = aggregate;
