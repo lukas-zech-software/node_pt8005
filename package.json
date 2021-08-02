@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node --transpile-only src/index.ts",
-    "build": "tsc -p ./tsconfig.json --noEmit false"
+    "copy-public": "cp -R src/server/public dist/server",
+    "copy-views": "cp -R src/server/views dist/server",
+    "build": "tsc -p ./tsconfig.json --noEmit false && npm run copy-public && npm run copy-views"
   },
   "keywords": [],
   "author": "",
