@@ -260,7 +260,7 @@ export class PTMeter {
     this.measurementValuesEntriesBuffer.push({
       ...aggregate,
       interval: this.logInterval,
-      timestamp: Date.now() / 1000,
+      timestamp: Math.floor(Date.now() / 1000),
       environment_id: this.currentEnvironmentInfo.environment,
       window_state_id: this.currentEnvironmentInfo.windowState,
     })
