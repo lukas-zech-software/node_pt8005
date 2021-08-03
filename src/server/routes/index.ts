@@ -7,6 +7,30 @@ import { DbEnvironmentsAndWindowState } from '../../common';
 import { DbService } from '../../db';
 import * as createError from 'http-errors';
 
+const defaultQuery =`
+SELECT
+  min,
+  max,
+  mean,
+  datetime(timestamp,'unixepoch', 'localtime') as date,
+  environments.name as environment,
+  window_states.name as windowState
+FROM
+  measurement_values
+INNER JOIN
+  environments
+ON
+ measurement_values.environment_id = environments.id
+INNER JOIN
+  window_states
+ON
+  measurement_values.window_state_id = window_states.id
+WHERE
+  date > '2021-08-01 20:00:00'
+AND
+  environments.name = 'Büro'
+`
+
 export function getIndexRouter(): Router {
 	const indexRouter = Router();
 	let dbState: DbEnvironmentsAndWindowState | undefined = undefined;
@@ -19,11 +43,10 @@ export function getIndexRouter(): Router {
 	indexRouter.get('/', function (req, res, next) {
 		const meterStatus = PTMeter.getInstance().getMeterStatus();
 		if (!dbState || !!req.query["refreshDb"]) {
-			console.log('dbState');
 			refreshDbState()
 		}
 
-		res.render('index', {meterStatus, dbState});
+		res.render('index', {meterStatus, dbState, defaultQuery});
 	});
 
 	indexRouter.post('/environment', function (req, res, next) {
@@ -34,6 +57,12 @@ export function getIndexRouter(): Router {
 	indexRouter.post('/windowstate', function (req, res, next) {
 		PTMeter.getInstance().setEnvironment({windowState: req.body.id});
 		res.status(201).send();
+	});
+
+	indexRouter.post('/db/query', function (req, res, next) {
+		const result = DbService.getInstance().executeQuery(req.body.query);
+		res.setHeader("content-type", "application/json");
+		res.status(201).send(JSON.stringify(result));
 	});
 
 	indexRouter.get('/export/db*', function (req, res, next) {

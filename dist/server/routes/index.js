@@ -7,6 +7,29 @@ const fs_1 = require("fs");
 const PtMeter_1 = require("../../PtMeter");
 const db_1 = require("../../db");
 const createError = require("http-errors");
+const defaultQuery = `
+SELECT
+  min,
+  max,
+  mean,
+  datetime(timestamp,'unixepoch', 'localtime') as date,
+  environments.name as environment,
+  window_states.name as windowState
+FROM
+  measurement_values
+INNER JOIN
+  environments
+ON
+ measurement_values.environment_id = environments.id
+INNER JOIN
+  window_states
+ON
+  measurement_values.window_state_id = window_states.id
+WHERE
+  date > '2021-08-01 20:00:00'
+AND
+  environments.name = 'Büro'
+`;
 function getIndexRouter() {
     const indexRouter = express_1.Router();
     let dbState = undefined;
@@ -17,10 +40,9 @@ function getIndexRouter() {
     indexRouter.get('/', function (req, res, next) {
         const meterStatus = PtMeter_1.PTMeter.getInstance().getMeterStatus();
         if (!dbState || !!req.query["refreshDb"]) {
-            console.log('dbState');
             refreshDbState();
         }
-        res.render('index', { meterStatus, dbState });
+        res.render('index', { meterStatus, dbState, defaultQuery });
     });
     indexRouter.post('/environment', function (req, res, next) {
         PtMeter_1.PTMeter.getInstance().setEnvironment({ environment: req.body.id });
@@ -29,6 +51,11 @@ function getIndexRouter() {
     indexRouter.post('/windowstate', function (req, res, next) {
         PtMeter_1.PTMeter.getInstance().setEnvironment({ windowState: req.body.id });
         res.status(201).send();
+    });
+    indexRouter.post('/db/query', function (req, res, next) {
+        const result = db_1.DbService.getInstance().executeQuery(req.body.query);
+        res.setHeader("content-type", "application/json");
+        res.status(201).send(JSON.stringify(result));
     });
     indexRouter.get('/export/db*', function (req, res, next) {
         res.setHeader("content-type", "application/binary");
