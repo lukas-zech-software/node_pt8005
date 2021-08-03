@@ -2,64 +2,82 @@ extends layout
 
 block content
 
-  div.content
-    h1 PT-Meter
+	div.content
+		h1 PT-Meter
 
-    h2 Info
-    code=JSON.stringify(meterStatus.info)
+		h2 Info
+		code=JSON.stringify(meterStatus.info)
 
-    if meterStatus.error
-      h2.error Error
-      code=JSON.stringify(meterStatus.error)
+		if meterStatus.error
+			h2.error Error
+			code=JSON.stringify(meterStatus.error)
 
-    h2 Values
-    code=JSON.stringify(meterStatus.values)
+		h2 Values
+		code=JSON.stringify(meterStatus.values)
 
-    h2 Status
-    code=JSON.stringify(meterStatus.settings)
+		h2 Status
+		code=JSON.stringify(meterStatus.settings)
 
-    h2 Environment
-    code=JSON.stringify(meterStatus.environmentInfo)
+		h2 Environment
+		code=JSON.stringify(meterStatus.environmentInfo)
 
-  div.content
-    h1 Db State
-    code.hidden(id="dbmessage")
+	div.content
+		h1 Db State
+		code.hidden(id="dbmessage")
 
-    h2 Values Count
-    code=JSON.stringify(dbState.valuesCount)
+		h2 Values Count
+		code=JSON.stringify(dbState.valuesCount)
 
-    h2 environments
-    code=JSON.stringify(dbState.environments)
-    ul
-      each x in dbState.environments
-        li
-          input(
-            type='button'
-            onclick=`setEnvironment(${x.id})`
-            value=x.name
-            class=x.id===meterStatus.environmentInfo.environment?"active":"xxx"
-          )
+		h2 environments
+		code=JSON.stringify(dbState.environments)
+		ul
+			each x in dbState.environments
+				li
+					input(
+						type='button'
+						onclick=`setEnvironment(${x.id})`
+						value=x.name
+						class=x.id === meterStatus.environmentInfo.environment ? "active" : "xxx"
+					)
 
-    h2 windowStates
-    code=JSON.stringify(dbState.windowStates)
-    ul
-      each x in dbState.windowStates
-        li
-          input(
-            type='button'
-            onclick=`setWindowState(${x.id})`
-            value=x.name
-            class=x.id === meterStatus.environmentInfo.windowState ? "active" : "sss"
-          )
-  h2 Export
-    input(
-      type='button'
-      onclick=`downloadCsv()`
-      value="Download CSV"
-    )
+		h2 windowStates
+		code=JSON.stringify(dbState.windowStates)
+		ul
+			each x in dbState.windowStates
+				li
+					input(
+						type='button'
+						onclick=`setWindowState(${x.id})`
+						value=x.name
+						class=x.id === meterStatus.environmentInfo.windowState ? "active" : "sss"
+					)
+	h2 Query
+		textarea(
+			id="txt_query"
+			rows=10
+		) !{defaultQuery}
 
-    input(
-      type='button'
-      onclick=`downloadDb()`
-      value="Download DB"
-    )
+		textarea(
+			id="txt_result"
+			placeholder="Result will show here"
+			rows=10
+		)
+		input(
+			type='button'
+			onclick=`runQuery()`
+			value="Run query"
+		)
+
+
+	h2 Export
+		input(
+			type='button'
+			onclick=`downloadCsv()`
+			value="Download CSV"
+		)
+
+		input(
+			type='button'
+			onclick=`downloadDb()`
+			value="Download DB"
+		)

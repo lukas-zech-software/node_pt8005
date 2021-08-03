@@ -12,8 +12,8 @@ class DbService {
         }
         return instance;
     }
-    db;
     dbPath;
+    db;
     constructor() {
         this.dbPath = path_1.join(__dirname, '../db', 'database.db');
         this.db = this.connectDb();
@@ -185,6 +185,16 @@ FROM
             environments,
             windowStates
         };
+    }
+    executeQuery(query) {
+        try {
+            const sql = this.db.prepare(query);
+            return sql.all();
+        }
+        catch (error) {
+            console.log('Error while executing query', error);
+            return { error: error.toString() };
+        }
     }
 }
 exports.DbService = DbService;

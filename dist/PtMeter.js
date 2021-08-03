@@ -73,6 +73,12 @@ function calcData(buffer) {
 }
 let instance;
 class PTMeter {
+    static getInstance() {
+        if (instance === undefined) {
+            instance = new PTMeter();
+        }
+        return instance;
+    }
     logInterval = 1000;
     writeInterval = 10000;
     verbose = !!process.env.PT_VERBOSE;
@@ -118,12 +124,6 @@ class PTMeter {
         /*this.init().then(() => {
             this.infoMessage = "Initialised"
         })*/
-    }
-    static getInstance() {
-        if (instance === undefined) {
-            instance = new PTMeter();
-        }
-        return instance;
     }
     /*
 
@@ -265,7 +265,7 @@ class PTMeter {
         this.measurementValuesEntriesBuffer.push({
             ...aggregate,
             interval: this.logInterval,
-            timestamp: Date.now() / 1000,
+            timestamp: Math.floor(Date.now() / 1000),
             environment_id: this.currentEnvironmentInfo.environment,
             window_state_id: this.currentEnvironmentInfo.windowState,
         });
