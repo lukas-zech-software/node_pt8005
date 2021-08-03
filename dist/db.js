@@ -186,6 +186,16 @@ FROM
             windowStates
         };
     }
+    runQuery(query) {
+        try {
+            const sql = this.db.prepare(query);
+            return sql.run();
+        }
+        catch (error) {
+            console.log('Error while executing query', error);
+            return { error: error.toString() };
+        }
+    }
     executeQuery(query) {
         try {
             const sql = this.db.prepare(query);

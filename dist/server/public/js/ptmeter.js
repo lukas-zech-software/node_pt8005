@@ -33,7 +33,15 @@ function setWindowState(id) {
 function runQuery() {
 	const query = document.getElementById("txt_query").value
 
-	post('/db/query', {query}).then((data) => {
+	post('/db/query/run', {query}).then((data) => {
+		document.getElementById("txt_result").value = JSON.stringify(data)
+	})
+}
+
+function executeQuery() {
+	const query = document.getElementById("txt_query").value
+
+	post('/db/query/execute', {query}).then((data) => {
 		document.getElementById("txt_result").value = JSON.stringify(data)
 	})
 }
