@@ -221,6 +221,16 @@ FROM
 		}
 	}
 
+	runQuery(query: string): any {
+		try {
+			const sql = this.db.prepare(query);
+			return sql.run()
+		} catch (error) {
+			console.log('Error while executing query', error);
+			return {error:error.toString()}
+		}
+	}
+
 	executeQuery(query: string): any {
 		try {
 			const sql = this.db.prepare(query);

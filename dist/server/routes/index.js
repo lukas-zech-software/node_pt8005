@@ -52,8 +52,13 @@ function getIndexRouter() {
         PtMeter_1.PTMeter.getInstance().setEnvironment({ windowState: req.body.id });
         res.status(201).send();
     });
-    indexRouter.post('/db/query', function (req, res, next) {
+    indexRouter.post('/db/query/execute', function (req, res, next) {
         const result = db_1.DbService.getInstance().executeQuery(req.body.query);
+        res.setHeader("content-type", "application/json");
+        res.status(201).send(JSON.stringify(result));
+    });
+    indexRouter.post('/db/query/run', function (req, res, next) {
+        const result = db_1.DbService.getInstance().runQuery(req.body.query);
         res.setHeader("content-type", "application/json");
         res.status(201).send(JSON.stringify(result));
     });
