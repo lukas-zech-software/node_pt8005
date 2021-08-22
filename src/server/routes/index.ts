@@ -6,6 +6,7 @@ import { PTMeter } from '../../PtMeter';
 import { DbEnvironmentsAndWindowState } from '../../common';
 import { DbService } from '../../db';
 import * as createError from 'http-errors';
+import { ChartNames, loadChartConfig, renderChartToBuffer } from '../../chart';
 
 const defaultQuery =`
 SELECT
@@ -42,7 +43,7 @@ export function getIndexRouter(): Router {
 	/* GET home page. */
 	indexRouter.get('/', function (req, res, next) {
 		const meterStatus = PTMeter.getInstance().getMeterStatus();
-		if (!dbState || !!req.query["refreshDb"]) {
+		if (!dbState || !!req.query['refreshDb']) {
 			refreshDbState()
 		}
 
@@ -61,18 +62,32 @@ export function getIndexRouter(): Router {
 
 	indexRouter.post('/db/query/execute', function (req, res, next) {
 		const result = DbService.getInstance().executeQuery(req.body.query);
-		res.setHeader("content-type", "application/json");
+		res.setHeader('content-type', 'application/json');
 		res.status(201).send(JSON.stringify(result));
 	});
 
 	indexRouter.post('/db/query/run', function (req, res, next) {
 		const result = DbService.getInstance().runQuery(req.body.query);
-		res.setHeader("content-type", "application/json");
+		res.setHeader('content-type', 'application/json');
 		res.status(201).send(JSON.stringify(result));
 	});
 
+	indexRouter.get('/export/chart/:chartName/:windowstate', async function (req, res, next) {
+		try {
+			const chartName = (req.params['chartName'] ?? 'max_mean') as ChartNames
+			const windowState = parseInt(req.params['windowstate'] as string ?? '1', 10)
+			const chartConfiguration = await loadChartConfig(chartName, {windowState})
+			const image = await renderChartToBuffer(chartConfiguration);
+
+			res.setHeader('content-type', 'image/png');
+			res.send(image)
+		} catch (error) {
+			res.status(500).json(error)
+		}
+	})
+
 	indexRouter.get('/export/db*', function (req, res, next) {
-		res.setHeader("content-type", "application/binary");
+		res.setHeader('content-type', 'application/binary');
 		res.setHeader('Content-Disposition', 'ptmeter.sqlite.db')
 		createReadStream(DbService.getInstance().dbPath).pipe(res);
 	})
@@ -80,11 +95,11 @@ export function getIndexRouter(): Router {
 	indexRouter.get('/export/csv*', function (req, res, next) {
 		let from: number | undefined, to: number | undefined;
 
-		let queryFrom = req.query["from"];
+		let queryFrom = req.query['from'];
 		if (typeof queryFrom === 'string') {
 			from = parseInt(queryFrom, 10)
 		}
-		let queryTo = req.query["to"];
+		let queryTo = req.query['to'];
 		if (typeof queryTo === 'string') {
 			to = parseInt(queryTo, 10)
 		}

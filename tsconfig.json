@@ -8,9 +8,10 @@
     "moduleResolution": "Node",
     "target": "ESNext",
     "sourceMap": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+	  "skipLibCheck": true
   },
-  "include": [
+	"include": [
     "src/**/*.ts"
   ],
   "exclude": [
