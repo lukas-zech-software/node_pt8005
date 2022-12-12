@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="321c3b14-f7c0-43ac-a40d-c830eb18bf64" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server/public/js/ptmeter.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/public/js/ptmeter.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server/routes/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/routes/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server/views/index.pug" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/views/index.pug" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/PtMeter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/chart.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/common.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/db.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index_old.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/public/js/ptmeter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/public/stylesheets/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/public/stylesheets/water.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/public/stylesheets/water.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/routes/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/views/error.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/views/index.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/server/views/layout.pug" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,26 +63,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="ECMAScript 6" />
-    <property name="javascript.nodejs.core.library.configured.version" value="14.17.0" />
-    <property name="javascript.nodejs.core.library.typings.version" value="14.17.0" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_interpreter_path" value="node" />
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Pug/Jade" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
-    <property name="vue.rearranger.settings.migration" value="true" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "node.js.selected.package.tslint": "(autodetect)",
+    "ts.external.directory.path": "/Users/luke/Projects/OpenSource/pt8005/node_modules/typescript/lib"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
@@ -170,7 +172,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
