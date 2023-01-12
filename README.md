@@ -16,11 +16,18 @@ This allows to make different measurements for different rooms with open and clo
 * Power Supply and USB cable
 * Raspberry Pi (v1 B+ or higher) or any another pc that can run Node.js
 
-1. Place the PT8005 where yuo want to measure the noise level
+![](./images/pt_8005_and_raspberry.jpg)
+
+
+
+1. Place the PT8005 where you want to measure the noise level
 2. Make sure to connect it to a power supply as it may turn off if powered by battery only (even if the battery is not depleted)
 3. Connect the USB cable to the PT8005 and your raspberry/pc
 4. Power on the PT8005 first before you start the raspberry or before you run the program on your connected pc
 5. Validate that the program is receiving data via the web interface `http://ip-or-hostname:3000/`
+
+![](./images/pt_8005_and_raspberry_2.jpg)
+
 
 # TODO: Add raspberry pi config and setup steps
 

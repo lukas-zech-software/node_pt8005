@@ -12,16 +12,10 @@ import {
 } from './common';
 import Delimiter = SerialPort.parsers.Delimiter;
 
+// No documentation is available for the serial protocol
+// These values are what I could reverse engineer / guess from observing and experimenting
 
-enum COMMANDS {
-	Min_Max = 0x11,
-	off = 0x33,
-	rec = 0x55,
-	speed = 0x77,
-	range = 0x88,
-	dBA_C = 0x99
-}
-
+// Header that defines the type of the payload in the frame
 enum FLAGS {
 	TERMINATOR = 0x00,
 	DELIMITER = 0xA5,
@@ -36,7 +30,6 @@ enum FLAGS {
 
 	RANGE_30_80 = 0x30,
 
-	XX_RANGE_50_100 = 0x20,
 	RANGE_50_100 = 0x4B,
 
 	RANGE_80_130 = 0x4C,
@@ -50,7 +43,7 @@ enum FLAGS {
 	_FULL = 0x23,
 	HOLD = 0x11,
 
-
+	// TODO: Unknown flags found in serial data
 	XX1 = 0x19,
 	XX2 = 0x1F,
 	XX3 = 0x1A,
@@ -60,13 +53,29 @@ enum FLAGS {
 	XX9 = 0x76,
 	XX10 = 0x75,
 	XX_RANGE_30_80 = 0x10,
-
+	XX_RANGE_50_100 = 0x20,
 }
 
+// Send these to change the current configuration of the device
+// TODO: Sending configuration does not seem to work reliably -> need to debug protocol
+enum COMMANDS {
+	Min_Max = 0x11,
+	off = 0x33,
+	rec = 0x55,
+	speed = 0x77,
+	range = 0x88,
+	dBA_C = 0x99
+}
+
+// Noise ranges for calibration of the device
 type Ranges = FLAGS.RANGE_30_80 | FLAGS.RANGE_50_100 | FLAGS.RANGE_80_130 | FLAGS.RANGE_30_130;
 
 
-function calcTime(buffer: Buffer) {
+/**
+ * Decode the custom time format sent by the device
+ * @param buffer
+ */
+function decodeTimeBuffer(buffer: Buffer) {
 	//<Buffer 24 03 27 >
 	const bufferString = buffer.toString('hex');
 	let [pm, h, m1 = '0', m2 = '0', s1 = '0', s2 = '0'] = bufferString;
@@ -87,11 +96,11 @@ function calcTime(buffer: Buffer) {
 	return `${hour}:${minutes}:${seconds}`
 }
 
-function calcData(buffer: Buffer) {
+function decodeDateBuffer(buffer: Buffer) {
 	//<Buffer 04 52>
 	const bufferString = buffer.toString('hex');
 	// let [v100 = '0', v10 = '0', v1 = '0', v01 = '0'] = bufferString;
-	//console.log("[v100='0',v10='0',v1='0',v01='0']", [v100, v10, v1, v01]);
+	// console.log("[v100='0',v10='0',v1='0',v01='0']", [v100, v10, v1, v01]);
 	const parsed = parseInt(bufferString, 10)
 
 	return parsed / 10;
@@ -108,6 +117,9 @@ type PTFrame = {
 
 let instance: PTMeter;
 
+/**
+ * Represents a PT_8005 device connected to USB serial port
+ */
 export class PTMeter {
 	public static getInstance(): PTMeter {
 		if (instance === undefined) {
@@ -177,6 +189,9 @@ export class PTMeter {
 	}
 
 	/*
+
+	TODO: Set a specific configuration on device before logging
+	  Check binary protocol - currently the device always reset the config immediatelly
 
 		async init(): Promise<void> {
 			let isCorrectRangeSet = await this.checkRange();
@@ -422,10 +437,10 @@ export class PTMeter {
 				frame.readings.hold = data.length > 1 ? data.length : undefined;
 				break;
 			case FLAGS[FLAGS.DATA]:
-				frame.readings.value = calcData(data);
+				frame.readings.value = decodeDateBuffer(data);
 				break;
 			case FLAGS[FLAGS.TIME]:
-				frame.readings.time = calcTime(data)
+				frame.readings.time = decodeTimeBuffer(data)
 				break;
 			case undefined:
 			default: {
